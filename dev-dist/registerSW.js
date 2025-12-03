@@ -1,0 +1,1 @@
+if('serviceWorker' in navigator) navigator.serviceWorker.register('/ShiftPayReact/dev-sw.js?dev-sw', { scope: '/ShiftPayReact/', type: 'classic' })

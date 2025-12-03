@@ -1,0 +1,52 @@
+/* Mobile-first tweaks and layout adjustments */
+
+@media (max-width: 640px) {
+  .floating-orb {
+    display: none;
+  }
+
+  .panel-animated::before {
+    opacity: 0.55;
+  }
+
+  .month-picker-root {
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+  }
+
+  .app-shell {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-top: 1rem;
+    padding-bottom: 1.5rem;
+    row-gap: 1rem;
+  }
+
+  .calendar-panel,
+  .summary-panel {
+    padding: 1rem;
+    border-radius: 1.25rem;
+  }
+
+  .summary-panel table {
+    font-size: 0.8rem;
+  }
+
+  .shift-modal-inner {
+    max-height: calc(100vh - 3rem);
+    overflow-y: auto;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .app-shell {
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+    row-gap: 1.25rem;
+  }
+
+  .month-picker-root {
+    margin-top: 0.25rem;
+    margin-bottom: 0.75rem;
+  }
+}
