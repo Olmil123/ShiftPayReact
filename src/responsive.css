@@ -1,12 +1,47 @@
 /* Mobile-first tweaks and layout adjustments */
 
 @media (max-width: 640px) {
-  .floating-orb {
-    display: none;
+  /* Make background cheaper on low-end phones */
+  .aurora-layer {
+    opacity: 0.55;
+    background-size: 220% 220%;
+    animation: none; /* static gradient on mobile to avoid jank */
+  }
+
+  .aurora-layer--2 {
+    opacity: 0.85;
   }
 
   .panel-animated::before {
-    opacity: 0.55;
+    opacity: 0.4;
+    animation: none;
+  }
+
+  /* Calendar day sizing on small screens */
+  .calendar-day {
+    min-height: 3.25rem;
+    padding: 0.55rem 0.55rem;
+    border-radius: 1.25rem;
+  }
+
+  .calendar-day > span:first-child {
+    font-size: 0.7rem;
+  }
+
+  .calendar-day span.inline-flex {
+    font-size: 0.68rem;
+    padding-inline: 0.4rem;
+  }
+
+  /* Compact month label inside the cell on small screens */
+  .month-chip {
+    font-size: 0.55rem;
+    padding: 0.1rem 0.3rem;
+    border-radius: 9999px;
+  }
+
+  .floating-orb {
+    display: none;
   }
 
   .month-picker-root {
@@ -26,6 +61,10 @@
   .summary-panel {
     padding: 1rem;
     border-radius: 1.25rem;
+    /* remove heavy blur on scroll */
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.85);
   }
 
   .summary-panel table {

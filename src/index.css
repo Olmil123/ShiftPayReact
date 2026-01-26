@@ -24,6 +24,26 @@ body {
   box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25);
 }
 
+/* Force 24-hour format for time inputs (hide AM/PM) */
+input[type="time"].time-input-24h {
+  /* Force 24-hour format */
+  color-scheme: dark;
+}
+
+input[type="time"].time-input-24h::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+
+/* Hide AM/PM selector if browser shows it */
+input[type="time"].time-input-24h::-webkit-datetime-edit-ampm-field {
+  display: none;
+}
+
+/* For Firefox */
+input[type="time"].time-input-24h {
+  -moz-appearance: textfield;
+}
+
 /* Animated background layers */
 .aurora-layer,
 .aurora-layer--2,
@@ -40,16 +60,17 @@ body {
 
 .aurora-layer {
   background: linear-gradient(
-    120deg,
-    #0f172a,
-    #1d4ed8,
+    130deg,
+    #022c22,
+    #064e3b,
+    #16a34a,
     #22c55e,
-    #a855f7,
-    #0f172a
+    #bbf7d0,
+    #022c22
   );
-  background-size: 400% 400%;
-  opacity: 0.65;
-  animation: bgShift 18s ease-in-out infinite alternate;
+  background-size: 320% 320%;
+  opacity: 0.7;
+  animation: bgShift 36s linear infinite;
 }
 
 .aurora-layer--2 {
@@ -170,15 +191,12 @@ body {
 
 @keyframes bgShift {
   0% {
-    transform: translate3d(-18%, -16%, 0) scale(1.05);
     background-position: 0% 40%;
   }
   50% {
-    transform: translate3d(12%, 12%, 0) scale(1.1);
-    background-position: 60% 70%;
+    background-position: 55% 65%;
   }
   100% {
-    transform: translate3d(-8%, 14%, 0) scale(1.04);
     background-position: 100% 30%;
   }
 }

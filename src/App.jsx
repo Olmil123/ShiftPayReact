@@ -20,6 +20,29 @@ import {
 const STORAGE_KEY = "shiftpay-react-v1";
 const STORAGE_VERSION_KEY = "shiftpay-react-version";
 const CURRENT_STORAGE_VERSION = 1;
+const LANG_STORAGE_KEY = "shiftpay-lang";
+const TEMPLATE_STORAGE_KEY = "shiftpay-templates";
+
+const QUICK_PRESETS = [
+  {
+    id: "day-6-18",
+    start: "06:00",
+    end: "18:00",
+    breakMin: "60",
+  },
+  {
+    id: "day-9-21",
+    start: "09:45",
+    end: "21:45",
+    breakMin: "60",
+  },
+  {
+    id: "long-8-20",
+    start: "08:00",
+    end: "20:00",
+    breakMin: "60",
+  },
+];
 
 function migrateState(state, fromVersion, toVersion) {
   let next = { ...state };
@@ -71,6 +94,29 @@ function loadPersistedState() {
       savePersistedState(data);
     }
 
+    // Fallback: if language is missing in payload, try dedicated lang key
+    if (!data.lang) {
+      const storedLang = localStorage.getItem(LANG_STORAGE_KEY);
+      if (storedLang && LANGS[storedLang]) {
+        data.lang = storedLang;
+      }
+    }
+
+    // Fallback: if templates are missing in payload, try dedicated templates key
+    if (!Array.isArray(data.templates)) {
+      try {
+        const rawTemplates = localStorage.getItem(TEMPLATE_STORAGE_KEY);
+        if (rawTemplates) {
+          const parsedTemplates = JSON.parse(rawTemplates);
+          if (Array.isArray(parsedTemplates)) {
+            data.templates = parsedTemplates;
+          }
+        }
+      } catch {
+        // ignore corrupted templates
+      }
+    }
+
     return data;
   } catch {
     // ignore corrupted storage
@@ -94,6 +140,8 @@ export default function App() {
   const [monthCursor, setMonthCursor] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
   const [shifts, setShifts] = useState([]);
   const [lang, setLang] = useState(DEFAULT_LANG);
+  const [templates, setTemplates] = useState([]);
+  const [isHydrated, setIsHydrated] = useState(false);
 
   const [editingDate, setEditingDate] = useState(null);
   const [form, setForm] = useState(emptyForm);
@@ -116,25 +164,49 @@ export default function App() {
 
   useEffect(() => {
     const persisted = loadPersistedState();
-    if (!persisted) return;
-
-    if (persisted.baseRate != null) setBaseRate(persisted.baseRate);
-    if (persisted.defaultBreak != null) setDefaultBreak(persisted.defaultBreak);
-    if (Array.isArray(persisted.shifts)) setShifts(persisted.shifts);
-    if (persisted.monthCursor) setMonthCursor(new Date(persisted.monthCursor));
-    if (persisted.lang && LANGS[persisted.lang]) setLang(persisted.lang);
+    if (persisted) {
+      if (persisted.baseRate != null) setBaseRate(persisted.baseRate);
+      if (persisted.defaultBreak != null) setDefaultBreak(persisted.defaultBreak);
+      if (Array.isArray(persisted.shifts)) setShifts(persisted.shifts);
+      if (persisted.monthCursor) setMonthCursor(new Date(persisted.monthCursor));
+      if (persisted.lang && LANGS[persisted.lang]) setLang(persisted.lang);
+      if (Array.isArray(persisted.templates)) setTemplates(persisted.templates);
+    }
+    setIsHydrated(true);
   }, []);
 
   useEffect(() => {
+    if (!isHydrated) return;
     const payload = {
       baseRate,
       defaultBreak,
       shifts,
       monthCursor: monthCursor.toISOString(),
       lang,
+      templates,
     };
     savePersistedState(payload);
-  }, [baseRate, defaultBreak, shifts, monthCursor, lang]);
+  }, [baseRate, defaultBreak, shifts, monthCursor, lang, templates, isHydrated]);
+
+  // Persist chosen language in a simple key as well, so it survives clears and format changes
+  useEffect(() => {
+    if (!isHydrated) return;
+    try {
+      localStorage.setItem(LANG_STORAGE_KEY, lang);
+    } catch {
+      // ignore
+    }
+  }, [lang, isHydrated]);
+
+  // Persist templates separately as well
+  useEffect(() => {
+    if (!isHydrated) return;
+    try {
+      localStorage.setItem(TEMPLATE_STORAGE_KEY, JSON.stringify(templates));
+    } catch {
+      // ignore
+    }
+  }, [templates, isHydrated]);
 
   const monthMatrix = useMemo(() => buildMonthMatrix(monthCursor), [monthCursor]);
   const monthLabel = useMemo(() => {
@@ -196,6 +268,21 @@ export default function App() {
 
   const handleDeleteShift = useCallback((dateStr) => {
     setShifts((prev) => prev.filter((shift) => shift.date !== dateStr));
+  }, []);
+
+  const handleSaveTemplate = useCallback((template) => {
+    if (!template?.start || !template?.end) return;
+    setTemplates((prev) => {
+      const newTemplate = {
+        id: `tpl-${Date.now()}`,
+        ...template,
+      };
+      return [...prev, newTemplate].slice(0, 20);
+    });
+  }, []);
+
+  const handleDeleteTemplate = useCallback((templateId) => {
+    setTemplates((prev) => prev.filter((t) => t.id !== templateId));
   }, []);
 
   const handleClearAll = useCallback(() => {
@@ -275,6 +362,10 @@ export default function App() {
           baseRate={baseRate}
           locale={locale}
           presetColors={PRESET_COLORS}
+          quickPresets={QUICK_PRESETS}
+          templates={templates}
+          onSaveTemplate={handleSaveTemplate}
+          onDeleteTemplate={handleDeleteTemplate}
         />
 
         <FooterNote strings={strings} />

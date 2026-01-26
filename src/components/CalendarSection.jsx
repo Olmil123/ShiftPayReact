@@ -35,6 +35,7 @@ export default function CalendarSection({
             : null;
 
           const buttonClasses = [
+            "calendar-day",
             "group relative flex aspect-square min-h-[3.85rem] sm:min-h-[4.6rem] lg:min-h-[5.1rem] flex-col justify-between rounded-3xl p-3 text-left transition-all duration-200",
             "ring-1 ring-slate-800/70 ring-offset-[4px] ring-offset-slate-950/75",
           ];
@@ -63,7 +64,7 @@ export default function CalendarSection({
               }
             >
               {monthChip && (
-                <span className="pointer-events-none absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border border-slate-700/60 bg-slate-950/80 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-300 shadow-lg">
+                <span className="month-chip pointer-events-none absolute top-1 right-1 whitespace-nowrap rounded-full border border-slate-700/60 bg-slate-950/85 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.18em] text-slate-300 shadow-lg">
                   {monthChip}
                 </span>
               )}

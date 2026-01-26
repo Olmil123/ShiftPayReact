@@ -18,7 +18,7 @@ export default function SettingsPanel({
             type="number"
             inputMode="decimal"
             className="inp"
-            value={baseRate}
+            value={baseRate === 0 ? "" : baseRate}
             onChange={(event) => onBaseRateChange(Number(event.target.value || 0))}
           />
         </label>
@@ -28,7 +28,7 @@ export default function SettingsPanel({
             type="number"
             inputMode="numeric"
             className="inp"
-            value={defaultBreak}
+            value={defaultBreak === 0 ? "" : defaultBreak}
             onChange={(event) => onDefaultBreakChange(Number(event.target.value || 0))}
           />
         </label>

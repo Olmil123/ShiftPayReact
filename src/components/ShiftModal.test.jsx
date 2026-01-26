@@ -5,6 +5,10 @@ import ShiftModal from "./ShiftModal";
 const baseStrings = {
   shiftOn: "Shift on {date}",
   modalHint: "Hint",
+  quickPresetsLabel: "Quick templates:",
+  saveTemplate: "Save as template",
+  templateNamePlaceholder: "Template name (optional)",
+  myTemplatesLabel: "My templates:",
   start: "Start",
   end: "End",
   break: "Break",
@@ -80,6 +84,44 @@ describe("ShiftModal", () => {
 
     fireEvent.click(screen.getByText(baseStrings.cancel));
     expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("applies quick preset when clicked", () => {
+    const { onChange } = renderModal({
+      quickPresets: [
+        { id: "preset1", start: "06:00", end: "14:00", breakMin: "15" },
+      ],
+    });
+
+    const presetButton = screen.getByText("06:00–14:00");
+    fireEvent.click(presetButton);
+
+    expect(onChange).toHaveBeenCalledWith("start", "06:00");
+    expect(onChange).toHaveBeenCalledWith("end", "14:00");
+    expect(onChange).toHaveBeenCalledWith("breakMin", "15");
+  });
+
+  it("calls onSaveTemplate when saving a custom template", () => {
+    const onSaveTemplate = vi.fn();
+
+    renderModal({
+      onSaveTemplate,
+    });
+
+    const nameInput = screen.getByPlaceholderText(
+      baseStrings.templateNamePlaceholder,
+    );
+    fireEvent.change(nameInput, { target: { value: "Day shift" } });
+
+    const saveButton = screen.getByText(baseStrings.saveTemplate);
+    fireEvent.click(saveButton);
+
+    expect(onSaveTemplate).toHaveBeenCalledTimes(1);
+    expect(onSaveTemplate.mock.calls[0][0]).toMatchObject({
+      name: "Day shift",
+      start: "08:00",
+      end: "16:00",
+    });
   });
 
   it("does not render anything when open is false", () => {
